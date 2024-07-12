@@ -1,0 +1,24 @@
+features
+basic 
+1. given a mathematical statement including +,-,/,*
+2. order operation according to PEMDAS
+
+advanced
+1. grouping statement according to brackets
+2. include double type
+
+Technical details
+What do i know?
+1. How to convert array of byte into stream of Tokens.
+2. How to make result from this Token.
+lexical analysis: https://www.javatpoint.com/the-phases-of-a-compiler-lexical-analysis
+symbol table: https://www.javatpoint.com/symbol-table
+interpreter: https://craftinginterpreters.com/the-lox-language.html
+
+Lexical Analysis
+1. break down byte stream into token
+2. load token stream into equal sized buffer
+3. token is pre-defined seq of character that can not be broken down futher.
+4. lexeme a patter of token is lexem
+5. identify lexem using fat and slow pointer in the buffer
+6. if a given lexeme does not match a pattern its lexical error

@@ -1,0 +1,22 @@
+
+8/7/24
+1. convert token to lexeme 
+
+9/7/24
+1. convert operator token to lexeme
+
+10/7/24
+1. How to use lexme to make sense
+
+11/7/24
+1. Build syntax tree from lexeme (parent is always  operator)
+2. Do syntactical analysis
+3. Bottom up tree parsing for result
+
+12/7/24
+1. Build syntax tree from lexeme (parent is always  operator)
+2. Do syntactical analysis
+3. Bottom up tree parsing for result
+
+Pending
+1. dont use space as delimiter
