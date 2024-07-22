@@ -59,11 +59,61 @@ pub const Lexeme = struct {
 
     pub fn log(self: Lexeme) void {
         if (self.kind == LexemeTypeTag.number) {
-            std.debug.print("{any}\n", .{self.value.number.value});
-            std.debug.print("{any}\n", .{self.value.number.exponent});
+            std.debug.print("value {any}\n", .{self.value.number.value});
+            std.debug.print("exponent {any}\n", .{self.value.number.exponent});
         }
         if (self.kind == LexemeTypeTag.operator) {
             std.debug.print("{any}\n", .{self.value.operator.kind});
         }
     }
 };
+
+pub fn operate(operatorLexeme: Lexeme, param1: Lexeme, param: Lexeme) Lexeme {
+    if (param.kind != LexemeTypeTag.number or param1.kind != LexemeTypeTag.number) {
+        std.debug.print("add operation not possible\n", .{});
+    }
+
+    // return Lexeme{ .kind = LexemeTypeTag.number, .value = LexemeType{ .number = Number{
+    //     .dotFound = param.value.number.dotFound,
+    //     .exponent = param.value.number.exponent,
+    //     .value = param1.value.number.value + param.value.number.value,
+    // } } };
+
+    var res: Lexeme = undefined;
+    if (operatorLexeme.kind != LexemeTypeTag.operator) {
+        std.debug.print("we need operator lexeme\n", .{});
+    }
+
+    switch (operatorLexeme.value.operator.kind) {
+        OperatorTag.add => {
+            res = Lexeme{ .kind = LexemeTypeTag.number, .value = LexemeType{ .number = Number{
+                .dotFound = param.value.number.dotFound,
+                .exponent = param.value.number.exponent,
+                .value = param1.value.number.value + param.value.number.value,
+            } } };
+        },
+        OperatorTag.sub => {
+            res = Lexeme{ .kind = LexemeTypeTag.number, .value = LexemeType{ .number = Number{
+                .dotFound = param.value.number.dotFound,
+                .exponent = param.value.number.exponent,
+                .value = param1.value.number.value - param.value.number.value,
+            } } };
+        },
+        OperatorTag.mul => {
+            res = Lexeme{ .kind = LexemeTypeTag.number, .value = LexemeType{ .number = Number{
+                .dotFound = param.value.number.dotFound,
+                .exponent = param.value.number.exponent,
+                .value = param1.value.number.value * param.value.number.value,
+            } } };
+        },
+        OperatorTag.div => {
+            res = Lexeme{ .kind = LexemeTypeTag.number, .value = LexemeType{ .number = Number{
+                .dotFound = param.value.number.dotFound,
+                .exponent = param.value.number.exponent,
+                .value = param1.value.number.value / param.value.number.value,
+            } } };
+        },
+    }
+
+    return res;
+}

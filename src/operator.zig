@@ -31,6 +31,7 @@ pub const Operator = struct {
 
         return operator;
     }
+
     // fn operate(self: Operator, operand1: Number, operand2: Number) !Number {
     //     if (operand1.kind != operand2.kind) return OperationError.ErrInvalidOperation;
     //     var result = Number{

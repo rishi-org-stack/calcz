@@ -16,7 +16,33 @@
 12/7/24
 1. Build syntax tree from lexeme (parent is always  operator)
 2. Do syntactical analysis
-3. Bottom up tree parsing for result
+
+13/7/24
+1. Bug: right node is operator
+2. Do bottom up parsing to find result from parser
+
+14/7/24
+1. Top down parsing based on operator type, right now it only sums up all the args.
+
+15/7/24
+1. Add pemdas impl for precedence.
+
+16/7/24
+1. Add pemdas impl for precedence.
+
+17/7/24
+1. test pemdas impl for precedence.
+2. add bfs on log method of tree
+
+18/7/24
+1. tree is incorrect fix it.
+
+22/7/24
+1. All of the above is complete
+
+23/7/24
+1. Refactor and arrange code
+2. Add tests
 
 Pending
 1. dont use space as delimiter
