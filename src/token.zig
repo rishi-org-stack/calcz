@@ -1,4 +1,4 @@
-pub const TokenType = enum {
+pub const TokenTypeTag = enum {
     plus,
     minus,
     division,
@@ -9,16 +9,16 @@ pub const TokenType = enum {
     space,
     none,
 
-    pub fn fromByte(identifier: u8) TokenType {
+    pub fn fromByte(identifier: u8) TokenTypeTag {
         switch (identifier) {
-            42 => return TokenType.multiply,
-            43 => return TokenType.plus,
-            45 => return TokenType.minus,
-            47 => return TokenType.division,
-            48...58 => return TokenType.digit,
-            46 => return TokenType.dot,
-            32 => return TokenType.space,
-            else => return TokenType.none,
+            42 => return TokenTypeTag.multiply,
+            43 => return TokenTypeTag.plus,
+            45 => return TokenTypeTag.minus,
+            47 => return TokenTypeTag.division,
+            48...58 => return TokenTypeTag.digit,
+            46 => return TokenTypeTag.dot,
+            32 => return TokenTypeTag.space,
+            else => return TokenTypeTag.none,
         }
     }
 };
@@ -26,16 +26,16 @@ pub const TokenType = enum {
 pub const TokenError = error{ErrInvalidToken};
 
 pub const Token = struct {
-    kind: TokenType,
+    kind: TokenTypeTag,
     value: u8,
 
     pub fn fromByte(idetifier: u8) !Token {
-        var tokenType: TokenType = TokenType.fromByte(idetifier);
+        var tokenTypeTag: TokenTypeTag = TokenTypeTag.fromByte(idetifier);
 
-        if (tokenType == TokenType.none) return TokenError.ErrInvalidToken;
+        if (tokenTypeTag == TokenTypeTag.none) return TokenError.ErrInvalidToken;
 
         return Token{
-            .kind = tokenType,
+            .kind = tokenTypeTag,
             .value = idetifier,
         };
     }

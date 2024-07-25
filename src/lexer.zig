@@ -2,7 +2,7 @@ const std = @import("std");
 //-------------------------
 const tokenF = @import("token.zig");
 const Token = tokenF.Token;
-const TokenType = tokenF.TokenType;
+const TokenTypeTag = tokenF.TokenTypeTag;
 const TokenError = tokenF.TokenError;
 //-------------------------
 
@@ -39,7 +39,7 @@ pub const Lexer = struct {
                 };
 
                 try lexeme.fromToken(forwardToken);
-                if (forwardToken.kind == TokenType.space) {
+                if (forwardToken.kind == TokenTypeTag.space) {
                     j += 1;
                     break;
                 }

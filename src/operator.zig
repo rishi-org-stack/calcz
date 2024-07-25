@@ -1,6 +1,6 @@
 const token = @import("token.zig");
 const Token = token.Token;
-const TokenType = token.TokenType;
+const TokenTypeTag = token.TokenTypeTag;
 
 pub const OperatorTag = enum { add, sub, div, mul };
 
@@ -13,19 +13,19 @@ pub const Operator = struct {
         var operator: Operator = undefined;
 
         switch (tk.kind) {
-            TokenType.plus => {
+            TokenTypeTag.plus => {
                 operator = Operator{ .kind = OperatorTag.add };
             },
 
-            TokenType.minus => {
+            TokenTypeTag.minus => {
                 operator = Operator{ .kind = OperatorTag.sub };
             },
 
-            TokenType.multiply => {
+            TokenTypeTag.multiply => {
                 operator = Operator{ .kind = OperatorTag.mul };
             },
 
-            TokenType.division => {
+            TokenTypeTag.division => {
                 operator = Operator{ .kind = OperatorTag.div };
             },
 

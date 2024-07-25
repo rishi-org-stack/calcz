@@ -3,7 +3,7 @@ const std = @import("std");
 //-------------------------
 const tokenF = @import("token.zig");
 const Token = tokenF.Token;
-const TokenType = tokenF.TokenType;
+const TokenTypeTag = tokenF.TokenTypeTag;
 const TokenError = tokenF.TokenError;
 //-------------------------
 
@@ -31,7 +31,7 @@ pub const Lexeme = struct {
         var lexeme: Lexeme = undefined;
 
         switch (tk.kind) {
-            TokenType.digit => {
+            TokenTypeTag.digit => {
                 lexeme = Lexeme{ .kind = LexemeTypeTag.number, .value = LexemeType{ .number = Number{ .value = tk.value - 48, .exponent = 0, .dotFound = false } } };
             },
 
@@ -45,13 +45,13 @@ pub const Lexeme = struct {
 
     pub fn fromToken(self: *Lexeme, tk: Token) !void {
         switch (tk.kind) {
-            TokenType.digit => {
+            TokenTypeTag.digit => {
                 var last: u128 = self.value.number.value;
                 self.value.number.value = last * 10 + (tk.value - 48);
                 if (self.value.number.dotFound) self.value.number.exponent += 1;
             },
 
-            TokenType.dot => {
+            TokenTypeTag.dot => {
                 // var last: u128 = self.value.number.exponent;
                 if (self.value.number.dotFound) return LexemeError.ErrInvalidLexeme;
                 self.value.number.dotFound = true;

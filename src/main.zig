@@ -163,8 +163,8 @@ fn executeExpr(lexemes: []Lexeme, allocator: Allocator) !void {
     result.log();
 }
 
-fn makeExpr(bufferStream: []const u8, allocator: Allocator) ![]Lexeme {
-    var lexemes = try Lexer.fromBufferStream(allocator, bufferStream, 21);
+fn makeExpr(bufferStream: []const u8, size: usize, allocator: Allocator) ![]Lexeme {
+    var lexemes = try Lexer.fromBufferStream(allocator, bufferStream, size);
 
     std.debug.print("len {d}\n", .{lexemes.len});
     _ = syntax.syntaxAnalyzer(lexemes, lexemes.len) catch |err| {
@@ -176,16 +176,19 @@ fn makeExpr(bufferStream: []const u8, allocator: Allocator) ![]Lexeme {
 
 pub fn main() !void {
     var allocator = gpa(.{}){};
-    var expr = try makeExpr("9 + 1 + 2 - 4 * 2 / 2", allocator.allocator());
 
-    try executeExpr(expr, allocator.allocator());
-    // while (true) {
-    //     const stdin = std.io.getStdIn().reader();
-    //     var buf_reader = std.io.bufferedReader(stdin);
-    //     const reader = buf_reader.reader();
+    while (true) {
+        const stdin = std.io.getStdIn().reader();
+        var buf_reader = std.io.bufferedReader(stdin);
+        const reader = buf_reader.reader();
 
-    //     var buf: [1024]u8 = undefined; // Adjust buffer size as needed
-    //     const line = try reader.readUntilDelimiterOrEof(&buf, '\n');
-    // }
+        var buf: [100]u8 = undefined; //TODO: Adjust buffer size as needed
+        var line = try reader.readUntilDelimiterOrEof(&buf, '\n');
+        const size: usize = line.?.len;
+        const buffer: []u8 = line.?;
+
+        var expr = try makeExpr(buffer, size, allocator.allocator());
+        try executeExpr(expr, allocator.allocator());
+    }
 }
 test "simple test" {}
