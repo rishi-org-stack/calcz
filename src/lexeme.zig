@@ -1,4 +1,5 @@
 const std = @import("std");
+
 //-------------------------
 const tokenF = @import("token.zig");
 const Token = tokenF.Token;
@@ -10,7 +11,7 @@ const TokenError = tokenF.TokenError;
 const operatorF = @import("operator.zig");
 const Operator = operatorF.Operator;
 const OperatorTag = operatorF.OperatorTag;
-const OperatorError = operatorF.OperationError;
+const OperatorError = operatorF.OperatorError;
 //------------------------
 
 //-------------------------
@@ -28,6 +29,7 @@ pub const Lexeme = struct {
 
     pub fn new(tk: Token) !Lexeme {
         var lexeme: Lexeme = undefined;
+
         switch (tk.kind) {
             TokenType.digit => {
                 lexeme = Lexeme{ .kind = LexemeTypeTag.number, .value = LexemeType{ .number = Number{ .value = tk.value - 48, .exponent = 0, .dotFound = false } } };
@@ -48,11 +50,13 @@ pub const Lexeme = struct {
                 self.value.number.value = last * 10 + (tk.value - 48);
                 if (self.value.number.dotFound) self.value.number.exponent += 1;
             },
+
             TokenType.dot => {
                 // var last: u128 = self.value.number.exponent;
                 if (self.value.number.dotFound) return LexemeError.ErrInvalidLexeme;
                 self.value.number.dotFound = true;
             },
+
             else => {},
         }
     }
@@ -92,6 +96,7 @@ pub fn operate(operatorLexeme: Lexeme, param1: Lexeme, param: Lexeme) Lexeme {
                 .value = param1.value.number.value + param.value.number.value,
             } } };
         },
+
         OperatorTag.sub => {
             res = Lexeme{ .kind = LexemeTypeTag.number, .value = LexemeType{ .number = Number{
                 .dotFound = param.value.number.dotFound,
@@ -99,6 +104,7 @@ pub fn operate(operatorLexeme: Lexeme, param1: Lexeme, param: Lexeme) Lexeme {
                 .value = param1.value.number.value - param.value.number.value,
             } } };
         },
+
         OperatorTag.mul => {
             res = Lexeme{ .kind = LexemeTypeTag.number, .value = LexemeType{ .number = Number{
                 .dotFound = param.value.number.dotFound,
@@ -106,6 +112,7 @@ pub fn operate(operatorLexeme: Lexeme, param1: Lexeme, param: Lexeme) Lexeme {
                 .value = param1.value.number.value * param.value.number.value,
             } } };
         },
+
         OperatorTag.div => {
             res = Lexeme{ .kind = LexemeTypeTag.number, .value = LexemeType{ .number = Number{
                 .dotFound = param.value.number.dotFound,

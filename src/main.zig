@@ -11,6 +11,7 @@ const syntax = @import("syntax.zig");
 const Allocator = std.mem.Allocator;
 const gpa = std.heap.GeneralPurposeAllocator;
 const Queue = std.atomic.Queue;
+
 /// Node inside the tree.
 pub const Node = struct {
     value: Lexeme,
@@ -44,30 +45,83 @@ pub const Node = struct {
         assert(self.containsNode(node));
         allocator.destroy(node);
     }
-
-    /// Allocate and initialize a node and its value.
-    ///
-    /// Arguments:
-    ///     value: Value (aka weight, key, etc.) of newly created node.
-    ///     allocator: Dynamic memory allocator.
-    ///
-    /// Returns:
-    ///     A pointer to the new node.
-    ///
-    /// Errors:
-    ///     If a new node cannot be allocated.
-    pub fn createNode(self: *Node, value: Lexeme, allocator: Allocator) !*Node {
-        var node = try self.allocateNode(allocator);
-        node.* = Node.init(value);
-        return node;
-    }
 };
+
 pub fn Tree() type {
     return struct {
         const Self = @This();
         root: Node,
 
-        pub fn init(root: Node) Self {
+        fn makeTreefromLexemes(lexemes: []Lexeme, size: usize, allocator: Allocator) !Node {
+            var root = try Node.init(lexemes[1], allocator);
+            var leftN = Node.init(lexemes[0], allocator) catch |err| {
+                std.debug.print("err {any}\n", .{err});
+                return err;
+            };
+
+            var rightN = Node.init(lexemes[2], allocator) catch |err| {
+                std.debug.print("err {any}\n", .{err});
+                return err;
+            };
+            root.*.left = leftN;
+            root.*.right = rightN;
+
+            var i: usize = 3;
+            while (i < size) {
+                var currentNode = Node.init(lexemes[i], allocator) catch |err| {
+                    std.debug.print("err {any}\n", .{err});
+                    return err;
+                };
+
+                if (currentNode.*.value.value.operator.kind == OperatorTag.mul or currentNode.*.value.value.operator.kind == OperatorTag.div) {
+                    var subRoot = currentNode;
+                    var newRightNode = Node.init(lexemes[i + 1], allocator) catch |err| {
+                        std.debug.print("err {any}\n", .{err});
+                        return err;
+                    };
+                    var newLeftNode = Node.init(lexemes[i - 1], allocator) catch |err| {
+                        std.debug.print("err {any}\n", .{err});
+                        return err;
+                    };
+                    subRoot.*.right = newRightNode;
+                    subRoot.*.left = newLeftNode;
+                    var k = i + 2;
+                    while (k < size) {
+                        var newNode = Node.init(lexemes[k], allocator) catch |err| {
+                            std.debug.print("err {any}\n", .{err});
+                            return err;
+                        };
+                        var newSubRightNode = Node.init(lexemes[k + 1], allocator) catch |err| {
+                            std.debug.print("err {any}\n", .{err});
+                            return err;
+                        };
+
+                        newNode.*.right = newSubRightNode;
+                        newNode.*.left = subRoot;
+                        subRoot = newNode;
+                        k += 2;
+                    }
+                    root.*.right = subRoot;
+                    i = k;
+                } else {
+                    var newNode = currentNode;
+                    var newRightNode = Node.init(lexemes[i + 1], allocator) catch |err| {
+                        std.debug.print("err {any}\n", .{err});
+                        return err;
+                    };
+
+                    newNode.*.right = newRightNode;
+                    newNode.*.left = root;
+                    root = newNode;
+                    i += 2;
+                }
+            }
+
+            return root.*;
+        }
+
+        pub fn init(lexemes: []Lexeme, size: usize, allocator: Allocator) !Self {
+            var root = try makeTreefromLexemes(lexemes, size, allocator);
             return Self{
                 .root = root,
             };
@@ -87,80 +141,13 @@ pub fn Tree() type {
         }
     };
 }
+
 //-------------------------
 const operatorF = @import("operator.zig");
 const Operator = operatorF.Operator;
 const OperatorTag = operatorF.OperatorTag;
-const OperatorError = operatorF.OperationError;
+const OperatorError = operatorF.OperatorError;
 //------------------------
-pub fn makeTreefromLexemes(lexemes: []Lexeme, size: usize, allocator: Allocator) !Tree() {
-    var root = try Node.init(lexemes[1], allocator);
-    var leftN = Node.init(lexemes[0], allocator) catch |err| {
-        std.debug.print("err {any}\n", .{err});
-        return err;
-    };
-
-    var rightN = Node.init(lexemes[2], allocator) catch |err| {
-        std.debug.print("err {any}\n", .{err});
-        return err;
-    };
-    root.*.left = leftN;
-    root.*.right = rightN;
-
-    var i: usize = 3;
-    while (i < size) {
-        var currentNode = Node.init(lexemes[i], allocator) catch |err| {
-            std.debug.print("err {any}\n", .{err});
-            return err;
-        };
-
-        if (currentNode.*.value.value.operator.kind == OperatorTag.mul) {
-            var subRoot = currentNode;
-            var newRightNode = Node.init(lexemes[i + 1], allocator) catch |err| {
-                std.debug.print("err {any}\n", .{err});
-                return err;
-            };
-            var newLeftNode = Node.init(lexemes[i - 1], allocator) catch |err| {
-                std.debug.print("err {any}\n", .{err});
-                return err;
-            };
-            subRoot.*.right = newRightNode;
-            subRoot.*.left = newLeftNode;
-            var k = i + 2;
-            while (k < size) {
-                var newNode = Node.init(lexemes[k], allocator) catch |err| {
-                    std.debug.print("err {any}\n", .{err});
-                    return err;
-                };
-                var newSubRightNode = Node.init(lexemes[k + 1], allocator) catch |err| {
-                    std.debug.print("err {any}\n", .{err});
-                    return err;
-                };
-
-                newNode.*.right = newSubRightNode;
-                newNode.*.left = subRoot;
-                subRoot = newNode;
-                k += 2;
-            }
-            root.*.right = subRoot;
-            i = k;
-        } else {
-            var newNode = currentNode;
-            var newRightNode = Node.init(lexemes[i + 1], allocator) catch |err| {
-                std.debug.print("err {any}\n", .{err});
-                return err;
-            };
-
-            newNode.*.right = newRightNode;
-            newNode.*.left = root;
-            root = newNode;
-            i += 2;
-        }
-    }
-    var tree = Tree().init(root.*);
-
-    return tree;
-}
 
 //-------------------------
 const lexemeF = @import("lexeme.zig");
@@ -168,21 +155,37 @@ const Lexeme = lexemeF.Lexeme;
 const LexemeTypeTag = lexemeF.LexemeTypeTag;
 //-------------------------
 
-pub fn main() !void {
-    var allocator = gpa(.{}){};
-    var lexemes = try Lexer.fromBufferStream(allocator.allocator(), "9 + 1 + 2 - 4 * 2 / 2", 21);
-
-    std.debug.print("len {d}\n", .{lexemes.len});
-    _ = syntax.syntaxAnalyzer(lexemes, lexemes.len) catch |err| {
-        std.debug.print("invalid syntax err: {any}\n", .{err});
-        return;
-    };
-
+fn executeExpr(lexemes: []Lexeme, allocator: Allocator) !void {
     var size = lexemes.len;
-    var tree = try makeTreefromLexemes(lexemes, size, allocator.allocator());
-    // tree.log();
+    var tree = try Tree().init(lexemes, size, allocator);
+
     var result = tree.root.sum();
     result.log();
 }
 
+fn makeExpr(bufferStream: []const u8, allocator: Allocator) ![]Lexeme {
+    var lexemes = try Lexer.fromBufferStream(allocator, bufferStream, 21);
+
+    std.debug.print("len {d}\n", .{lexemes.len});
+    _ = syntax.syntaxAnalyzer(lexemes, lexemes.len) catch |err| {
+        std.debug.print("invalid syntax err: {any}\n", .{err});
+    };
+
+    return lexemes;
+}
+
+pub fn main() !void {
+    var allocator = gpa(.{}){};
+    var expr = try makeExpr("9 + 1 + 2 - 4 * 2 / 2", allocator.allocator());
+
+    try executeExpr(expr, allocator.allocator());
+    // while (true) {
+    //     const stdin = std.io.getStdIn().reader();
+    //     var buf_reader = std.io.bufferedReader(stdin);
+    //     const reader = buf_reader.reader();
+
+    //     var buf: [1024]u8 = undefined; // Adjust buffer size as needed
+    //     const line = try reader.readUntilDelimiterOrEof(&buf, '\n');
+    // }
+}
 test "simple test" {}

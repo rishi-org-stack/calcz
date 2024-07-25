@@ -6,16 +6,16 @@ const Lexeme = lexemeF.Lexeme;
 const LexemeTypeTag = lexemeF.LexemeTypeTag;
 //-------------------------
 
-const SyntaxError = error{ErrIvalidSyntax};
+const SyntaxError = error{ErrInvalidSyntax};
 
 pub fn syntaxAnalyzer(lexemes: []Lexeme, size: usize) !void {
-    if (size == 0) return SyntaxError.ErrIvalidSyntax;
+    if (size == 0) return SyntaxError.ErrInvalidSyntax;
 
     const startLexeme: Lexeme = lexemes[0];
-    if (startLexeme.kind == LexemeTypeTag.operator) return SyntaxError.ErrIvalidSyntax;
+    if (startLexeme.kind == LexemeTypeTag.operator) return SyntaxError.ErrInvalidSyntax;
 
     const lastLexeme: Lexeme = lexemes[size - 1];
-    if (lastLexeme.kind == LexemeTypeTag.operator) return SyntaxError.ErrIvalidSyntax;
+    if (lastLexeme.kind == LexemeTypeTag.operator) return SyntaxError.ErrInvalidSyntax;
 
     var iter: usize = 1;
     while (iter < size) {
@@ -25,7 +25,7 @@ pub fn syntaxAnalyzer(lexemes: []Lexeme, size: usize) !void {
         const prevLexeme: Lexeme = lexemes[prevIter];
 
         if (currentLexeme.kind == prevLexeme.kind)
-            return SyntaxError.ErrIvalidSyntax;
+            return SyntaxError.ErrInvalidSyntax;
 
         iter += 1;
     }

@@ -44,5 +44,9 @@
 1. Refactor and arrange code
 2. Add tests
 
+24/7/24
+1. Add read-eval loop
+2. Add tests
+
 Pending
 1. dont use space as delimiter
